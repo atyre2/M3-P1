@@ -1,0 +1,22 @@
+---
+title: "Problem Case Title"
+author: "Drew Tyre"
+date: Sys.Date()
+output: markdown
+
+---
+
+This is where the background information on the 
+problem case goes. Use LaTex for equations. 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.path='www/') # put figures in www directory so they are sent to client
+
+```
+
+Before running app you must 
+ 
+```{r build, eval=FALSE}
+knitr::knit("introduction.Rmd")
+```
+
+to generate introduction.md. 
