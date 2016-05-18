@@ -1,22 +1,130 @@
 ---
-title: "Problem Case Title"
+title: "Feral Cat Problem Case"
 author: "Drew Tyre"
 date: Sys.Date()
 output: markdown
 
 ---
 
-This is where the background information on the 
-problem case goes. Use LaTex for equations. 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(fig.path='www/') # put figures in www directory so they are sent to client
+> *"Populations of feral cats are large, have high intrinsic rates of growth, and are highly adaptable to different and sometimes harsh habitats."* [Foley et al. (2005)](https://www.avma.org/News/Journals/Collections/Documents/javma_227_11_1775.pdf)
+
+A cat owner, a politician, a conservation biologist, an animal control officer and an animal rights activist sat down at a table together. This sounds like the start of a bad joke, but it's a sampling of the range of stakeholders with interests in the management of feral cat populations. Each of you has been assigned a "role" to play in this problem case. Each role has a value statement, and an objective.
+
+1^st Class Session
+  1. View the video "Trap-Neuter-Release"
+  2. Gather in "Role Groups"---review your value statements and objectives.
+  3. Reorganize into normal management teams---review the information, set learning objectives, define management options.
+  
+2^nd Class Session
+  * Discuss logistic population model and translate options into dynamics. Assign groups to evaluate each option in spreadsheet.
+  
+3^rd Class Session
+  * Groups report to class on outcomes for each management option.
+
+***  
+
+**Issues:**
+
+- Feral cats have diseases such as rabies, Feline Immunodeficiency Virus, and Feline Leukemia that can be transmitted to domestic cats.
+
+- Cats (feral and domestic) are the definitive host to *Toxoplasma*, a protozoan parasite that can infect humans by contact with cat feces. 3500 infants are born in the US in a year with severe infections.
+
+- There were 137 reported cat bites in FY 2003--2004. Stray or unlicensed cats account for ~70% of bites.
+
+- Cats mostly eat small rodents. Rodents can transmit diseases to humans (*Hantavirus*, *Tularemia*).
+
+- Estimates of native fauna consumed vary---but clearly not zero.
+
+- It is estimated that trapping, sheltering, and euthanizing a cat costs $80 / animal [(Alley Cat Allies)](http://www.alleycat.org), while TNR costs are typically estimated ~$25 / animal using volunteer veterinary services, trappers and transporters. A $3000 pilot TNR program in Lincoln neutered 10 cats.
+
+- Feeding feral cats increases the "carrying capacity" of the habitat.
+
+- \>95% of licensed cats in Lincoln are neutered.
+
+***
+
+```{r echo = FALSE, warning = FALSE, error = FALSE, message = FALSE, fig.height = 5, fig.width = 14 }
+
+library( ggplot2 )
+library( ggpmisc )
+library( grid )
+library( gridExtra )
+
+feralIndex <- read.csv( "data/feral_index.csv" )
+feralIndex$r <- NA
+
+for( i in 1:( nrow( feralIndex ) - 1 ) ){
+  feralIndex$r[ i ] <- log( feralIndex$Feral_Index[ i + 1 ] / feralIndex$Feral_Index[ i ] ) / ( feralIndex$Year[ i + 1 ] - feralIndex$Year[ i ] )
+}
+
+feralPlot <- ggplot( data = feralIndex, 
+                     aes( x = Year, 
+                          y = Feral_Index ) ) + 
+  geom_point( colour = "darkgreen", 
+              size = 3 ) + 
+  theme_classic() + 
+  labs( x = "Year", 
+        y = "Feral Index\n(Cats Impounded - Cats Claimed)" ) + 
+  scale_x_continuous( limits = c( 5 * min( feralIndex$Year ) %/% 5, 
+                                  5 * max( feralIndex$Year ) %/% 5 + 5 ), 
+                      breaks = seq( from = 5 * ( min( feralIndex$Year ) %/% 5 ), 
+                                    to = 5 * ( max( feralIndex$Year ) %/% 5 ) + 5, 
+                                    by = 5 ), 
+                      minor_breaks = NULL ) +
+  scale_y_continuous( limits = c( 0, 1000 * ( max( feralIndex$Feral_Index ) %/% 1000 ) + 1000 ), 
+                      breaks = seq( from = 0, 
+                                    to = 1000 * ( max( feralIndex$Feral_Index ) %/% 1000 ) + 1000, 
+                                    by = 100 * ( max( feralIndex$Feral_Index ) %/% 1000 ) + 100 ), 
+                      minor_breaks = NULL ) +
+  theme( axis.title = element_text( size = 15 ), 
+         axis.text = element_text( size = 10 ),
+         axis.line.x = element_line( colour = "black", size = 0.25 ), 
+         axis.line.y = element_line( colour = "black", size = 0.25 ) )
+
+growthPlot <- ggplot( data = feralIndex, 
+                      aes( x = Feral_Index, 
+                           y = r ) ) + 
+  geom_point( colour = "darkgreen", 
+              size = 3, 
+              na.rm = TRUE ) + 
+  geom_smooth( method = "lm", 
+               formula = y ~ x, 
+               na.rm = TRUE, 
+               se = FALSE, 
+               colour = "black", 
+               size = 0.5 ) + 
+  theme_classic() + 
+  labs( x = "Feral Index\n(Cats Impounded - Cats Claimed)", 
+        y = "Per-capita Growth Rate" ) + 
+  scale_x_continuous( limits = c( 200 * min( feralIndex$Feral_Index ) %/% 200, 
+                                  200 * max( feralIndex$Feral_Index ) %/% 200 + 200 ), 
+                      breaks = seq( from = 200 * min( feralIndex$Feral_Index ) %/% 200, 
+                                    to = 200 * max( feralIndex$Feral_Index ) %/% 200 + 200, 
+                                    by = 100 * ( max( feralIndex$Feral_Index ) %/% 1000 ) + 100 ), 
+                      minor_breaks = NULL ) +
+  scale_y_continuous( limits = c( 0.05 * ( min( feralIndex$r, na.rm = TRUE ) %/% 0.05 ) - 0.05, 
+                                  0.05 * ( max( feralIndex$r, na.rm = TRUE ) %/% 0.05 ) + 0.1 ), 
+                      breaks = seq( from = 0.05 * ( min( feralIndex$r, na.rm = TRUE ) %/% 0.05 ) - 0.05, 
+                                    to = 0.05 * ( max( feralIndex$r, na.rm = TRUE ) %/% 0.05 ) + 0.1, 
+                                    by = 0.05 ) ) +
+  theme( axis.title = element_text( size = 15 ), 
+         axis.text = element_text( size = 10 ), 
+         axis.line.x = element_line( colour = "black", size = 0.25 ), 
+         axis.line.y = element_line( colour = "black", size = 0.25 ) ) + 
+  stat_poly_eq( formula = y ~ x, 
+                size = 4, 
+                aes( label = paste( ..eq.label.., ..rr.label.., sep = "~~~~~" ) ), 
+                parse = TRUE, 
+                na.rm = TRUE, 
+                label.x = 1350, 
+                label.y = 0.18 )
+
+grid.arrange( rectGrob( gp = gpar( col = "white" ) ), 
+              feralPlot, 
+              rectGrob( gp = gpar( col = "white" ) ), 
+              growthPlot, 
+              rectGrob( gp = gpar( col = "white" ) ), 
+              widths = c( 0.02, 0.45, 0.06, 0.45, 0.02 ), 
+              ncol = 5 )
 
 ```
-
-Before running app you must 
- 
-```{r build, eval=FALSE}
-knitr::knit("introduction.Rmd")
-```
-
-to generate introduction.md. 
