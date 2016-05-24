@@ -2,62 +2,59 @@
 ## they should be named tP<i> where <i> is the
 ## index of the order they are created.
 
-tP1 <- fluidPage( # start "Do Nothing" fluidpage
-  
-  sliderInput( inputId = "a", 
-               label = "Per-capita decrease in birth rate:", 
-               min = 0, 
-               max = 0.002, 
-               value = 0.00015, 
-               ticks = FALSE, 
-               sep = "" ), 
-  
-  sliderInput( inputId = "b0", 
-               label = "Per-capita birth rate at N = 0:", 
-               min = 0, 
-               max = 10, 
-               value = 0.5, 
-               ticks = TRUE ), 
-  
-  sliderInput( inputId = "q", 
-               label = "Proportion of actual population trapped in index:", 
-               min = 0, 
-               max = 0.5, 
-               value = 0.07, 
-               ticks = TRUE, 
-               sep = "" ), 
-  
-  plotOutput( outputId = "linePlot" )
-  
-) # end "Do Nothing" fluidpage
-
-
-tP2 <- fluidPage( # start "Status Quo" fluidpage
-  
-) # end "Status Quo" fluidpage
-
-
-tP3 <- fluidPage( # start "Base TNR" fluidpage
-  
-) # end "Base TNR" fluidpage
-
-
-tP4 <- fluidPage( # start "TNR Alone" fluidpage
-  
-) # end "TNR Alone" fluidpage
-
-
-tP5 <- fluidPage( # start "Destructive Removal" fluidpage
-  
-) # end "Destructive Removal" fluidpage
-
-
-tP6 <- fluidPage( # start "Reduced Feeding" fluidpage
-  
-) # end "Reduced Feeding" fluidpage
-
-
-tP7 <- fluidPage( # start "Freestyle" fluidpage
-  
-) # end "Freestyle" fluidpage
-
+tP1 <- fluidPage( # start "Model" fluidpage
+  sidebarLayout(
+    sidebarPanel(
+      checkboxGroupInput( inputId = "toShow", 
+                          label = NULL, 
+                          choices = c( "Do nothing" = "dn", 
+                                       "Status quo" = "sq", 
+                                       "Destructive removal" = "dr", 
+                                       "TNR" = "tnr" ), 
+                          selected = c( "dn", "sq" ), 
+                          inline = TRUE ), 
+      sliderInput( inputId = "a", 
+                   label = "Per-capita decrease in birth rate:", 
+                   min = 0, 
+                   max = 0.002, 
+                   value = 0.00015, 
+                   step = 0.00001, 
+                   ticks = FALSE, 
+                   sep = "" ), 
+      sliderInput( inputId = "b0", 
+                   label = "Per-capita birth rate at N = 0:", 
+                   min = 0, 
+                   max = 2, 
+                   value = 0.5, 
+                   step = 0.01, 
+                   ticks = TRUE ), 
+      sliderInput( inputId = "q", 
+                   label = "Proportion of actual population trapped in index:", 
+                   min = 0, 
+                   max = 1, 
+                   value = 0.07, 
+                   step = 0.01, 
+                   ticks = TRUE, 
+                   sep = "" ), 
+      sliderInput( inputId = "TNRq", 
+                   label = "Annual quota for trap-neuter-release:", 
+                   min = 0, 
+                   max = 2000, 
+                   value = 200, 
+                   step = 1, 
+                   ticks = TRUE, 
+                   sep = "" ), 
+      sliderInput( inputId = "rq", 
+                   label = "Annual quota for destructive removal:", 
+                   min = 0, 
+                   max = 2000, 
+                   step = 1, 
+                   value = 0, 
+                   ticks = TRUE, 
+                   sep = "" )
+    ),
+    mainPanel( 
+      plotOutput( outputId = "popPlot" )
+    )
+  )
+) # end "Model" fluidpage
