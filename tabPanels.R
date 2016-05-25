@@ -8,10 +8,11 @@ tP1 <- fluidPage( # start "Model" fluidpage
       checkboxGroupInput( inputId = "toShow", 
                           label = NULL, 
                           choices = c( "Do nothing" = "dn", 
-                                       "Status quo" = "sq", 
+                                       "Reduced feeding" = "rf", 
                                        "Destructive removal" = "dr", 
-                                       "TNR" = "tnr" ), 
-                          selected = c( "dn", "sq" ), 
+                                       "TNR" = "tnr", 
+                                       "Combined effects" = "ce" ), 
+                          selected = c( "dn" ), 
                           inline = TRUE ), 
       sliderInput( inputId = "a", 
                    label = "Per-capita decrease in birth rate:", 
@@ -54,7 +55,8 @@ tP1 <- fluidPage( # start "Model" fluidpage
                    sep = "" )
     ),
     mainPanel( 
-      plotOutput( outputId = "popPlot" )
+      plotOutput( outputId = "popPlot" ), 
+      plotOutput( outputId = "ratePlot" )
     )
   )
 ) # end "Model" fluidpage

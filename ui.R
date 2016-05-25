@@ -7,7 +7,7 @@ shinyUI(
     navbarPage( "Feral Cat Problem Case", 
     tabPanel( "Introduction", 
              withMathJax(), 
-             includeMarkdown( "Introduction.md" ), 
+             includeMarkdown( "introduction.md" ), 
              value = "tP0" ), 
     tabPanel( "Model", tP1, value = "tP1" ), # end tabPanel "tP1"
     id = "panels", 
