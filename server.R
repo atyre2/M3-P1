@@ -122,6 +122,9 @@ shinyServer(
           if( theData$ce_TNRed[ i ] >= theData$ce_N[ i ] * 0.3 ){
             theData$ce_TNRed[ i ] <- theData$ce_N[ i ] * 0.3
           }
+          if( theData$ce_removed[ i ] >= theData$ce_N[ i ] * 0.3 ){
+            theData$ce_removed[ i ] <- theData$ce_N[ i ] * 0.3
+          }
           altN[ i ] <- altN[ i - 1 ] * exp( -parameters$d0 - ( parameters$c * ( theData$ce_N[ i - 1 ] + altN[ i - 1 ] ) ) ) + theData$ce_TNRed[ i - 1 ]
         }
         theData$ce_N <- theData$ce_N + altN
@@ -176,6 +179,23 @@ shinyServer(
                                 d0 = 0.22, 
                                 TNRq = input$TNRq, 
                                 rq = input$rq )
+      
+      ddf <- data.frame( N = 0:(1.2 * max( catFacts()$N ) ), 
+                         TNR = parameters$TNRq, 
+                         R <- parameters$rq, 
+                         d = parameters$d0 )
+
+## My attempt to make a rate for effective death rate (removal from breeding population)
+#       for( i in 1:length( ddf$N ) ){
+#         if( ddf$TNR[ i ] >= ddf$N[ i ] * 0.3 ){
+#           ddf$TNR[ i ] <- ddf$N[ i ] * 0.3
+#         }
+#         if( ddf$R[ i ] >= ddf$N[ i ] * 0.3 ){
+#           ddf$R[ i ] <- ddf$N[ i ] * 0.3
+#         }
+#         ddf$d[ i ] <- parameters$d0 + ( ( ddf$TNR[ i ] + ddf$R[ i ] ) / ddf$N[ i ] )
+#       }
+      
       ggplot( data = catFacts(), 
               aes( x = N ) ) + 
         theme_classic() + 
@@ -186,16 +206,31 @@ shinyServer(
                             limits = c( 0, 1.2 * max( catFacts()$N ) ), 
                             labels = scales::comma, 
                             expand = c( 0, 0 ) ) + 
-        scale_y_continuous( name = "b/d", 
+        scale_y_continuous( name = "Per-capita birth and death rates", 
                             breaks = pretty( seq( 0, 1.2 * parameters$b0, 0.01 ), n = 5 ), 
                             limits = c( 0, 1.2 * parameters$b0 ), 
                             expand = c( 0, 0 ) ) + 
         geom_abline( slope = -0.00015 * parameters$q, 
-                     intercept = parameters$b0 ) + 
+                     intercept = parameters$b0, 
+                     size = 1, 
+                     colour = "dodgerblue" ) + 
         geom_abline( slope = -parameters$a * parameters$q, 
-                     intercept = parameters$b0 ) + 
+                     intercept = parameters$b0, 
+                     size = 1, 
+                     colour = "mediumseagreen" ) + 
         geom_abline( slope = parameters$c, 
-                     intercept = parameters$d0 )
+                     intercept = parameters$d0, 
+                     size = 1, 
+                     colour = "tomato2" ) + 
+        geom_segment( x = ( parameters$d0 - parameters$b0 ) / ( parameters$c - parameters$sdb ), 
+                      y = ( ( parameters$sdb * ( parameters$b0 - parameters$d0 ) ) / ( parameters$c - parameters$sdb ) ) + parameters$b0, 
+                      xend = ( parameters$d0 - parameters$b0 ) / ( parameters$c - parameters$sdb ), 
+                      yend = 0, 
+                      linetype = "dashed" )# + 
+#         geom_line( data = ddf, 
+#                    aes( x = N, 
+#                         y = d ), 
+#                    colour = "orange" )
     } )
     
   }
